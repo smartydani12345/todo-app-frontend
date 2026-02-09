@@ -32,3 +32,21 @@ A modern **Todo Application Frontend** built with **React.js** (part of MERN sta
 ```bash
 git clone https://github.com/smartydani12345/todo-app-frontend.git
 cd todo-app-frontend
+
+2. Install dependencies
+npm install
+
+3. Configure environment variables
+
+Create a .env file at the root:
+
+REACT_APP_API_URL=http://localhost:8000  # Change to your backend URL
+
+4. Run the app locally
+npm start
+
+
+Open http://localhost:3000
+ to view in the browser.
+git clone https://github.com/smartydani12345/todo-app-frontend.git
+cd todo-app-frontend
