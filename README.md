@@ -45,60 +45,28 @@ frontend/
 └── tailwind.config.js
 
 
-## Setup
+## Run Locally
 
-### Prerequisites
-- Node.js 18+ for frontend
-- Python 3.11+ for backend
-- PostgreSQL-compatible database (Neon recommended)
-
-### Installation
+### Backend
 ```bash
-# Clone repo
-git clone https://github.com/smartydani12345/todo-app-frontend.git
-cd todo-app-frontend
-
-# Frontend
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+Frontend
 cd frontend
 npm install
 npm run dev
+Database
+PostgreSQL
 
-# Backend
-cd ../backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-Environment Variables
-DATABASE_URL: PostgreSQL connection string
+SQLModel / SQLAlchemy ORM
 
-BETTER_AUTH_SECRET: Secret key for JWT
-
-NEXT_PUBLIC_API_URL: Backend API endpoint
-
-BETTER_AUTH_JWT_EXPIRES_IN: JWT expiration (default: 7d)
-
-NEXT_PUBLIC_BASE_URL: Frontend base URL
-
-Deployment
-Backend: Deploy to Heroku, Railway, or any Python hosting
-
-Frontend: Deploy to Vercel, Netlify, or any Node.js hosting
-
-API Endpoints
-GET /api/tasks – List tasks
-
-POST /api/tasks – Create task
-
-GET /api/tasks/{id} – Get task
-
-PUT /api/tasks/{id} – Update task
-
-DELETE /api/tasks/{id} – Delete task
-
-PATCH /api/tasks/{id}/complete – Toggle completion
+Ready for deployment (Neon, Supabase, Railway, or local)
 
 Notes
-Phase 1 (console-based) has been superseded
+Open http://localhost:3000 to view in the browser
 
-Ensure .env has correct database credentials before running backend
+Make sure your .env has correct database credentials before running backend
 
-Open http://localhost:3000 to view frontend
+Phase 1 (console-based) has been superseded by this full-stack Phase 2
+
