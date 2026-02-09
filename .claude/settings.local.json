@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -d specs/*-todo-web-app)",
+      "Bash(python -m pytest tests/test_task_model.py -v)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python -c \"from main import app; print\\(''Application imported successfully''\\)\")",
+      "Bash(python -m backend.main)",
+      "Bash(npm run dev)",
+      "Bash(python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000:*)",
+      "Bash(curl:*)",
+      "Bash(python -m uvicorn:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill /PID 9636 /F:*)",
+      "Bash(python -c:*)",
+      "Bash(npx next dev:*)",
+      "Bash(tasklist /FI \"PID eq 9636\":*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill /f /pid:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(dir \".specify\\\\\\\\scripts\\\\\\\\bash\\\\\\\\create-phr.sh\":*)",
+      "Bash(dir:*)",
+      "Bash(npm install axios)",
+      "Bash(npm install @types/axios --save-dev)",
+      "Bash(npm view axios peerDependencies)",
+      "Bash(npm install @types/axios)",
+      "Bash(pip install:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(del:*)",
+      "Bash(taskkill:*)",
+      "Bash(ls:*)",
+      "Bash(pkill -f \"uvicorn\":*)",
+      "Bash(python test_db.py:*)",
+      "Bash(pkill -f uvicorn:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks:*)",
+      "Bash(timeout 5 ping:*)"
+    ]
+  }
+}
