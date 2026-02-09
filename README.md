@@ -1,52 +1,45 @@
-# MERN Stack Todo App (Frontend)
+# MERN Stack Todo Application 🚀
 
-![Todo App](https://user-images.githubusercontent.com/your-username/placeholder-image.png)
-
-A modern **Todo Application Frontend** built with **React.js** (part of MERN stack), fully responsive and integrated with a backend API for task management.
+A full-stack Todo application built with the MERN stack, featuring authentication, guest mode, landing page, and scalable architecture.
 
 ---
 
-## Features
+## 🔹 Tech Stack
 
-- Add, update, delete, and view tasks
-- Responsive design (desktop + mobile friendly)
-- Connects to a backend API for persistent data
-- Filter tasks by status (completed / pending)
-- Drag & drop reordering of tasks (if implemented in backend)
+### Frontend
+- React.js
+- Tailwind CSS
+- React Router
+- Axios
 
----
-
-## Tech Stack
-
-- **Frontend:** React.js, CSS/SCSS, Axios for API requests  
-- **Backend:** FastAPI / Node.js (separate repo)  
-- **Version Control:** Git & GitHub  
-- **Deployment:** Vercel / Netlify (Frontend)
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- JWT Authentication
 
 ---
 
-## Getting Started
+## 🔹 Core Features (Phase 1)
 
-### 1. Clone the repository
+- ✅ User Authentication (Login / Register)
+- ✅ Guest Mode (Use app without account)
+- ✅ Add / Edit / Delete Todos
+- ✅ Persistent Todos with Database
+- ✅ Responsive UI
 
-```bash
-git clone https://github.com/smartydani12345/todo-app-frontend.git
-cd todo-app-frontend
+---
 
-2. Install dependencies
-npm install
+## 🔹 Advanced Features (Phase 2)
 
-3. Configure environment variables
+- 🚀 Landing Page (Before Home)
+- 🚀 Frontend + Backend Integration
+- 🚀 Clean Project Structure (Frontend / Backend)
+- 🚀 Environment Variable Support
+- 🚀 Improved UI & UX
+- 🚀 Production Ready Build
 
-Create a .env file at the root:
+---
 
-REACT_APP_API_URL=http://localhost:8000  # Change to your backend URL
+## 🔹 Project Structure
 
-4. Run the app locally
-npm start
-
-
-Open http://localhost:3000
- to view in the browser.
-git clone https://github.com/smartydani12345/todo-app-frontend.git
-cd todo-app-frontend
