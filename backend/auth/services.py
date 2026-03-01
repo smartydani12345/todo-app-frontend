@@ -1,14 +1,15 @@
 from sqlmodel import Session, select
-from sqlalchemy.orm import sessionmaker
 from models.user import User, UserCreate
 from auth.utils import hash_password, verify_password
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 def get_user_by_email(session: Session, email: str) -> Optional[User]:
     """Get a user by email"""
     statement = select(User).where(User.email == email)
-    # Use the SQLAlchemy way which is compatible with current setup
     result = session.execute(statement)
     user = result.scalar_one_or_none()
     return user
@@ -16,9 +17,7 @@ def get_user_by_email(session: Session, email: str) -> Optional[User]:
 def create_user(session: Session, user_create: UserCreate, name: str) -> User:
     """Create a new user"""
     hashed_password = hash_password(user_create.password)
-
-    # Set timestamps explicitly
-    current_time = datetime.utcnow()
+    current_time = utc_now()
 
     db_user = User(
         name=name,
@@ -44,7 +43,20 @@ def authenticate_user(session: Session, email: str, password: str) -> Optional[U
     if not user:
         return None
 
-    if not verify_password(password, user.password_hash):
+    # Try password_hash first (new users)
+    if hasattr(user, 'password_hash') and user.password_hash:
+        if verify_password(password, user.password_hash):
+            return user
         return None
 
-    return user
+    # Fallback to password field (old users - plain text)
+    if hasattr(user, 'password') and user.password:
+        if password == user.password:
+            # Upgrade to hashed password
+            user.password_hash = hash_password(password)
+            session.add(user)
+            session.commit()
+            return user
+        return None
+
+    return None

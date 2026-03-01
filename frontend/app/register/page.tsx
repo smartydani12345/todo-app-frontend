@@ -208,23 +208,23 @@ export default function RegisterPage() {
     }
 
     try {
-      // Prepare form data to match backend expectations (form-data)
-      const formData = new FormData();
-      formData.append('name', name.trim());
-      formData.append('email', email.trim());
-      formData.append('password', password.trim());
-
-      const response = await apiClient.post("/auth/register", formData);
+      // Send as JSON
+      const response = await apiClient.post("/auth/register", {
+        name: name.trim(),
+        email: email.trim(),
+        password: password.trim(),
+      });
 
       // Save token using utility function and redirect to Phase 2 dashboard
       // Backend returns both user info and access_token in response
-      if (response.data.access_token) {
-        setToken(response.data.access_token);
+      const data = response.data as { access_token?: string; token?: string };
+      if (data.access_token) {
+        setToken(data.access_token);
         toast.success('Registration successful! Redirecting to dashboard...');
         router.push("/tasks"); // Redirect to Phase 2 dashboard
-      } else if (response.data.token) {
+      } else if (data.token) {
         // Alternative token field name
-        setToken(response.data.token);
+        setToken(data.token);
         toast.success('Registration successful! Redirecting to dashboard...');
         router.push("/tasks"); // Redirect to Phase 2 dashboard
       } else {

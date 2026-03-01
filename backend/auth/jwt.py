@@ -11,8 +11,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from database.session import get_session
 
-# Get secret from environment
-SECRET_KEY = os.getenv("BETTER_AUTH_SECRET", "fallback_secret_for_dev")
+# Get secret from environment - using same as auth.utils for consistency
+SECRET_KEY = os.getenv("JWT_SECRET", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 

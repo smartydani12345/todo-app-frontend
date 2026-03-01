@@ -1,0 +1,161 @@
+openapi: 3.0.3
+info:
+  title: Phase 3 Chatbot API
+  description: API specification for the Advanced AI Chatbot with Complete User Query Resolution
+  version: 1.0.0
+  contact:
+    name: TODO EVOLUTION Team
+    url: https://github.com/your-org/your-repo
+    email: support@example.com
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.todo-evolution.com
+    description: Production server
+paths:
+  /api/chat:
+    post:
+      summary: Send a message to the chatbot and receive a response
+      description: Processes user input through the AI chatbot and returns an appropriate response
+      operationId: chat_message
+      tags:
+        - Chat
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful response from the chatbot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Bad request - invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X POST http://localhost:8000/api/chat \
+              -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d '{"message": "Add a task to buy groceries", "language": "en"}'
+        - lang: python
+          source: |
+            import requests
+            
+            headers = {
+                "Authorization": "Bearer YOUR_JWT_TOKEN",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "message": "Add a task to buy groceries",
+                "language": "en"
+            }
+            
+            response = requests.post("http://localhost:8000/api/chat", json=data, headers=headers)
+            print(response.json())
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: The user's message to the chatbot
+          example: "Add a task to buy groceries"
+          minLength: 1
+          maxLength: 10000
+        language:
+          type: string
+          description: The language of the message (auto-detected if not provided)
+          enum: [en, ur, roman_ur, roman_en]
+          example: en
+        conversation_id:
+          type: integer
+          description: ID of existing conversation (optional, creates new if not provided)
+          example: 123
+    ChatResponse:
+      type: object
+      required:
+        - response
+        - conversation_id
+        - timestamp
+      properties:
+        response:
+          type: string
+          description: The chatbot's response to the user's message
+          example: "I've added the task 'buy groceries' to your list."
+        conversation_id:
+          type: integer
+          description: The ID of the conversation
+          example: 123
+        message_id:
+          type: integer
+          description: The ID of the message in the conversation
+          example: 456
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the response
+          example: "2026-02-13T10:00:00Z"
+        language:
+          type: string
+          description: The language of the response
+          enum: [en, ur, roman_ur, roman_en]
+          example: en
+        tools_used:
+          type: array
+          items:
+            type: string
+          description: List of tools used by the AI to generate the response
+          example: ["create_task_tool", "search_knowledge_base_tool"]
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Error message detailing what went wrong
+          example: "Invalid JWT token"
+tags:
+  - name: Chat
+    description: Chatbot interaction endpoints
+externalDocs:
+  description: Find out more about the TODO EVOLUTION project
+  url: https://github.com/your-org/your-repo

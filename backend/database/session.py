@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from .init_db import engine  # Import engine from init_db to avoid duplication
 from typing import Generator
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=Session)
 
 def get_session() -> Generator[Session, None, None]:
     """
@@ -12,5 +12,9 @@ def get_session() -> Generator[Session, None, None]:
     session = SessionLocal()
     try:
         yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
     finally:
         session.close()

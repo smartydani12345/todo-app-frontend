@@ -94,20 +94,10 @@ backend/test.db
 frontend/.next/
 frontend/out/
 frontend/build/
-frontend/public/build/b a c k e n d / n u l 
- 
- b a c k e n d / n u l 
- 
- n u l 
- 
- . c l a u d e / 
- 
- . q w e n / 
- 
- b a c k e n d / n u l 
- 
-nul
-backend/nul
-**/nul
+frontend/public/build/
 
+# Claude/IDE
+#.claude/
+#.qwen/
  
+gha-creds-*.json

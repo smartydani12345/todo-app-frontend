@@ -5,7 +5,11 @@ import { useRouter } from 'next/navigation';
 import apiClient from '../../lib/api-client';
 import { isAuthenticated } from '../../lib/tokenUtils';
 import toast from 'react-hot-toast';
-import { FiPlus, FiEdit, FiTrash2, FiX, FiCheck, FiCalendar, FiTag, FiFilter, FiSearch, FiDownload, FiPrinter, FiSettings, FiChevronDown, FiChevronUp, FiInfo, FiLogOut } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiX, FiCheck, FiCalendar, FiTag, FiFilter, FiSearch, FiDownload, FiPrinter, FiSettings, FiChevronDown, FiChevronUp, FiInfo, FiLogOut, FiMessageSquare } from 'react-icons/fi';
+import ChatbotWrapper from '../../components/ChatbotWrapper';
+import ChatAgent from '../../components/ChatAgent';
+import AnimatedFeatureCards from '../../components/AnimatedFeatureCards';
+import jwt from 'jsonwebtoken';
 
 interface Task {
   id: number;
@@ -22,14 +26,15 @@ interface Task {
 
 const Phase2Dashboard = () => {
   const router = useRouter();
-  
+
   // Basic Essentials State
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'medium' as 'high' | 'medium' | 'low', tags: '' });
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  
+  const [userId, setUserId] = useState<string>('');
+
   // Intermediate Tools State
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -38,7 +43,7 @@ const Phase2Dashboard = () => {
   const [sortBy, setSortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<string>('desc');
   const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
-  
+
   // Advanced Systems State
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showExportOptions, setShowExportOptions] = useState(false);
@@ -46,9 +51,9 @@ const Phase2Dashboard = () => {
   const [showAutomationRules, setShowAutomationRules] = useState(false);
   const [recurringTask, setRecurringTask] = useState({ enabled: false, interval: 'daily' });
   const [taskDependencies, setTaskDependencies] = useState<{[key: number]: number[]}>({});
-  
+
   // Refs for double-click to edit
-  const taskRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
+  const taskRefs = useRef<{[key: number]: HTMLLIElement | null}>({});
 
   // Check authentication and load tasks
   useEffect(() => {
@@ -57,8 +62,36 @@ const Phase2Dashboard = () => {
       return;
     }
 
+    // Get user ID from token
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      try {
+        const decodedToken: any = jwt.decode(token);
+        if (decodedToken && decodedToken.sub) {
+          setUserId(decodedToken.sub);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    }
+
     loadTasks();
-  }, [router, searchQuery, filterStatus, filterPriority, filterTag, sortBy, sortOrder]);
+  }, [router]);
+
+  // Listen for task-created event from ChatAgent
+  useEffect(() => {
+    const handleTaskCreated = (event: CustomEvent) => {
+      console.log('🎯 Task created event received!', event.detail);
+      loadTasks();
+      toast.success('Task added successfully via chat!');
+    };
+
+    window.addEventListener('task-created', handleTaskCreated as EventListener);
+
+    return () => {
+      window.removeEventListener('task-created', handleTaskCreated as EventListener);
+    };
+  }, []);
 
   const loadTasks = async () => {
     setLoading(true);
@@ -74,7 +107,7 @@ const Phase2Dashboard = () => {
       params.append('sort_order', sortOrder);
 
       const response = await apiClient.get(`/tasks/?${params.toString()}`);
-      setTasks(response.data);
+      setTasks(response.data as Task[]);
     } catch (err: any) {
       if (err.response?.status === 401) {
         // Token might be expired, remove it and redirect to login
@@ -103,7 +136,7 @@ const Phase2Dashboard = () => {
 
       const response = await apiClient.post('/tasks/', formData);
 
-      setTasks([...tasks, response.data]);
+      setTasks([...tasks, response.data as Task]);
       setNewTask({ title: '', description: '', priority: 'medium', tags: '' });
       toast.success('Task added successfully!');
     } catch (err: any) {
@@ -129,7 +162,7 @@ const Phase2Dashboard = () => {
       const response = await apiClient.put(`/tasks/${editingTask.id}`, formData);
 
       // Update the task in the state with the response data
-      setTasks(tasks.map(t => t.id === editingTask.id ? response.data : t));
+      setTasks(tasks.map(t => t.id === editingTask.id ? response.data as Task : t));
       setEditingTask(null);
       toast.success('Task updated successfully!');
     } catch (err: any) {
@@ -167,7 +200,7 @@ const Phase2Dashboard = () => {
       const response = await apiClient.patch(`/tasks/${taskId}/complete`, formData);
 
       // Update the task in the state with the response data
-      setTasks(tasks.map(t => t.id === taskId ? response.data : t));
+      setTasks(tasks.map(t => t.id === taskId ? response.data as Task : t));
       toast.success(`Task marked as ${task.completed ? 'incomplete' : 'complete'}!`);
     } catch (err: any) {
       console.error(err);
@@ -277,8 +310,8 @@ const Phase2Dashboard = () => {
 
       // Handle date comparison
       if (sortBy === 'created_at' || sortBy === 'due_date') {
-        aValue = new Date(aValue as string).getTime;
-        bValue = new Date(bValue as string).getTime;
+        aValue = new Date(aValue as string).getTime();
+        bValue = new Date(bValue as string).getTime();
       }
 
       if (sortOrder === 'asc') {
@@ -721,7 +754,7 @@ const Phase2Dashboard = () => {
               {filteredAndSortedTasks.map((task) => (
                 <li 
                   key={task.id} 
-                  ref={el => taskRefs.current[task.id] = el}
+                  ref={el => { taskRefs.current[task.id] = el; return void 0; }}
                   onDoubleClick={() => handleDoubleClick(task)}
                   className={`px-4 py-4 hover:bg-gray-700/50 transition-colors ${selectedTasks.includes(task.id) ? 'bg-gray-700/30' : ''}`}
                 >
@@ -802,6 +835,9 @@ const Phase2Dashboard = () => {
           </div>
         </div>
       </div>
+      
+      {/* Chatbot Integration */}
+      {userId && <ChatbotWrapper userId={userId} />}
     </div>
   );
 };

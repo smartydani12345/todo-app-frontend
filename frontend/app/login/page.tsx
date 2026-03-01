@@ -212,20 +212,20 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Prepare form data to match backend expectations (form-data)
-      const formData = new FormData();
-      formData.append('email', email.trim());
-      formData.append('password', password.trim());
-
-      const response = await apiClient.post("/auth/login", formData);
+      // Send as JSON
+      const response = await apiClient.post("/auth/login", {
+        email: email.trim(),
+        password: password.trim(),
+      });
 
       // Save token using utility function - backend returns access_token in response
-      if (response.data.access_token) {
-        setToken(response.data.access_token);
+      const data = response.data as { access_token?: string; token?: string };
+      if (data.access_token) {
+        setToken(data.access_token);
         toast.success('Login successful!');
-      } else if (response.data.token) {
+      } else if (data.token) {
         // Alternative token field name
-        setToken(response.data.token);
+        setToken(data.token);
         toast.success('Login successful!');
       }
 
