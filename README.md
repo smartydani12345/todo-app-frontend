@@ -1,4 +1,192 @@
-<<<<<<< HEAD
+# Todo Evolution Hackathon – Phase 2
+
+**Author:** Daniyal Azhar
+
+## 1️⃣ MVP Overview
+
+Objective: Build a modern, full-stack Todo app with per-user data isolation, task management, and responsive UI.
+
+**MVP Features (Phase 2):**
+
+- **User Authentication:** Register/Login, JWT-based, per-user data isolation  
+- **Task Management:** CRUD for tasks (title, description, due_date, status, priority)  
+- **Tagging & Priority Management:** Assign tags to tasks, manage priority levels  
+- **Search/Filter & Sorting:** Client-side real-time filtering by title, tag, status, date, priority  
+- **Responsive UI:** Dark/Light mode, accessibility-ready components  
+
+---
+
+## 2️⃣ Recommended Tech Stack
+
+| Layer           | Technology                    | Notes / Constraints |
+|-----------------|-------------------------------|-------------------|
+| Frontend        | Next.js (App Router preferred)| TypeScript, Tailwind CSS, Axios/fetch API client |
+| Backend         | FastAPI + SQLModel            | PostgreSQL (Neon Serverless), JWT auth, bcrypt password hashing |
+| Authentication  | JWT + Refresh Tokens          | Access token ~15min, refresh token rotation |
+| State / UX      | React context / Zustand       | Minimal global state for user/session |
+| Testing         | Pytest (backend), Jest + React Testing Library (frontend) | Unit + integration tests |
+| Deployment      | Vercel (frontend), Docker + cloud DB (backend) | Environment variables, migrations, logging |
+
+---
+
+## 3️⃣ Data Models (SQLModel / FastAPI)
+
+```python
+from sqlmodel import SQLModel, Field, Relationship
+from typing import List, Optional
+from datetime import datetime
+
+class User(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    email: str
+    password_hash: str
+    tasks: List["Task"] = Relationship(back_populates="user")
+    tags: List["Tag"] = Relationship(back_populates="user")
+
+class Task(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    title: str
+    description: Optional[str] = ""
+    due_date: Optional[datetime] = None
+    status: str = "pending"
+    priority: str = "medium"
+    tags: List["Tag"] = Relationship(back_populates="tasks", link_model="TaskTag")
+    user: "User" = Relationship(back_populates="tasks")
+
+class Tag(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    name: str
+    user_id: int = Field(foreign_key="user.id")
+    tasks: List[Task] = Relationship(back_populates="tags", link_model="TaskTag")
+    user: "User" = Relationship(back_populates="tags")
+
+class TaskTag(SQLModel, table=True):
+    task_id: int = Field(foreign_key="task.id", primary_key=True)
+    tag_id: int = Field(foreign_key="tag.id", primary_key=True)
+4️⃣ API Contract (REST-like)
+Endpoint	Method	Request	Response	Notes
+/auth/register	POST	{email, password}	{user_id, token}	Register user
+/auth/login	POST	{email, password}	{access_token, refresh_token}	Login, JWT auth
+/auth/refresh	POST	{refresh_token}	{access_token, refresh_token}	Rotate refresh tokens
+/tasks	GET	?search=&tag=&status=&priority=	[Task]	List/filter tasks
+/tasks	POST	{title, description, due_date, priority, tags[]}	Task	Create task
+/tasks/{id}	PUT	{title, description, due_date, priority, tags[]}	Task	Update task
+/tasks/{id}	DELETE	None	{success: true}	Delete task
+/tasks/{id}/complete	PATCH	None	Task	Toggle status
+/tags	GET	None	[Tag]	List user tags
+/tags	POST	{name}	Tag	Create tag
+/tags/{id}	DELETE	None	{success: true}	Delete tag
+5️⃣ Frontend Pages & Components
+
+Pages:
+
+/login → Auth form
+
+/register → Auth form
+
+/dashboard → Task list with filters
+
+/task/[id] → Task editor/detail page
+
+Components:
+
+TaskList → Display filtered tasks
+
+TaskEditor → Add/edit task modal/page
+
+TagFilter → Multi-tag filter UI
+
+PriorityBadge → Color-coded priority
+
+Header → Dark/light mode switch
+
+ResponsiveNav → Mobile/desktop navigation
+
+SearchInput → Debounced search input
+
+6️⃣ Step-by-Step Implementation Plan (Phase 2)
+
+Initialize repo (frontend + backend mono repo)
+
+Scaffold backend: FastAPI + SQLModel, JWT auth, PostgreSQL setup
+
+Scaffold frontend: Next.js App Router + Tailwind CSS
+
+Implement auth pages + JWT flow
+
+Implement task CRUD endpoints + database models
+
+Build frontend TaskList + TaskEditor + TagFilter
+
+Implement search, filtering, sorting
+
+Ensure responsive UI + dark/light mode
+
+Real-time UX: debounce search, optimistic updates
+
+Advanced filtering: multi-tag, status, priority
+
+Add unit & integration tests
+
+CI/CD: GitHub Actions
+
+Logging & error reporting
+
+Accessibility improvements
+
+7️⃣ Example Code Snippets
+
+Backend – Password Hashing
+
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+def verify_password(password, hashed):
+    return pwd_context.verify(password, hashed)
+
+Frontend – Fetch Tasks
+
+import axios from "axios";
+
+export const fetchTasks = async (token: string, filters = {}) => {
+  const res = await axios.get("/api/tasks", {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters,
+  });
+  return res.data;
+};
+8️⃣ Repo & Project Layout
+todo-app/
+├── backend/
+│   ├── api/
+│   ├── auth/
+│   ├── database/
+│   ├── models/
+│   ├── services/
+│   └── main.py
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── lib/
+│   ├── public/
+│   └── styles/
+├── docker-compose.yml
+├── .env.example
+└── README.md
+9️⃣ Non-Functional Considerations
+
+Auth & Security: JWT, bcrypt, refresh token rotation, per-user data isolation
+
+Testing: Unit + integration coverage, CI on GitHub Actions
+
+Accessibility: Keyboard navigation, ARIA labels, contrast ratios
+
+Logging & Monitoring: FastAPI logging, optional Sentry integration<<<<<<< HEAD
 # MERN Stack Todo App (Frontend)
 
 ![Todo App](https://user-images.githubusercontent.com/your-username/placeholder-image.png)
